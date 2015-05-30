@@ -1,3 +1,4 @@
+
 require "yaml"
 require 'command_line_reporter'
 require 'colorize'
@@ -54,3 +55,4 @@ class BankAccount < Person
     end
     
 end 
+
