@@ -28,17 +28,17 @@ module Transaction
         puts"---------------------------------"
         puts "Debit   |  Credit  |  No-Trans  "
         puts"-----------Deposit---------------"
-        all=@deposit.each{|trans| puts "$#{trans}"}
+            all=@deposit.each{|trans| puts "$#{trans}"}
         puts"Total deposit"
         total=all.sum
         puts"$#{total}"
         puts"-------------withdrawal----------"
-        less=@withdrawal.each{|withd| puts "$#{withd}"}
+            less=@withdrawal.each{|withd| puts "$#{withd}"}
         diff =less.sum
         puts "Total withdrawal"
         puts"$#{diff}"
         puts"-----------Bank Balance----------"
-        bank_bal = total + diff 
+             bank_bal = total + diff 
         puts "$#{bank_bal}"
     end
     
