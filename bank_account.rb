@@ -5,7 +5,7 @@ require 'colorize'
 class Person
     attr_accessor :info
 
-    def initialize(info={})
+    def initialize(info)
         @info = info
     end
 
@@ -14,14 +14,9 @@ class Person
     end
 
     def full_name
-        full_name =info[:first_name]
-    if !@middle_name.nil?
-        full_name += " "
-        full_name += info[:middle_name]
-    end
-        full_name += ' '
-        full_name += info[:last_name]
-        full_name
+      [:first_name, :middle_name, :last_name].map do |part|
+        info[part].to_s
+      end.join(" ")
     end
 
 end
@@ -31,9 +26,9 @@ class BankAccount < Person
      
     attr_accessor :balance, :pin
     @@count = 0
-    @@account_list = []
+    @account_list = []
 
-    def initialize(balance)
+    def initialize(balance)       
         super
         @info[:transaction]={}
         @info[:transaction][:deposit]=[]
@@ -45,13 +40,13 @@ class BankAccount < Person
 
     def open
         if File.exist?("bank_account.yml")
-          @@account_list = YAML.load_file("bank_account.yml")
+          @account_list = YAML.load_file("bank_account.yml")
         end
       end
 
     def save
         File.open("bank_account.yml", "w") do |file|
-          file.write(@@account_list.to_yaml)
+          file.write(@account_list.to_yaml)
         end
       end
 
@@ -66,7 +61,7 @@ class BankAccount < Person
         puts"---------------------------------"
         puts"       Accounts Lists            "
         puts"---------------------------------"
-        @@account_list.each do |account|
+        @account_list.each do |account|
             puts "#{account[:account_number]} | $#{account[:balance]}"
             puts"---------------------------------"
         end
@@ -79,7 +74,7 @@ class BankAccount < Person
    #contains all the operation need to manage a bank
    def self.get_balance(acct_num, pin)
         #search for the corresponding account in the account_list 
-        @@account_list.each do |account|
+        @account_list.each do |account|
             if account[:account_number] == acct_num && account[:pin] == pin           
         # return balance  for each new object
            puts"-----------------------------------"
@@ -94,7 +89,7 @@ class BankAccount < Person
     end 
 
     def self.make_deposit(acct_num,pin,amount)
-        @@account_list.each do |account|
+        @account_list.each do |account|
             if account[:account_number] == acct_num && account[:pin] == pin 
         #add amount to the balance and return the aggregated amount 
         depo_trans = account[:balance] += amount
@@ -108,7 +103,7 @@ class BankAccount < Person
     end
 
    def self.make_withdrawal(acct_num,pin,amount)
-       @@account_list.each do |account|
+       @account_list.each do |account|
             if account[:account_number] == acct_num && account[:pin] == pin 
         #add amount to the balance and return the aggregated amount 
         depo_withdrawal = account[:balance] -= amount
@@ -123,7 +118,7 @@ class BankAccount < Person
        end
     end 
 
-def self.transac_info
+   def self.transac_info
         count = 0
         transac_counter = count += 1
         puts"--------------------------------"
@@ -146,18 +141,24 @@ def self.transac_info
     end
 
 
-def transfer( account_origin,account_dest,pin, amount)
-        origin = @info[:balance]
-        @@account_list.each do |list|
-            if account_number == list[:account_number] && list[:pin] == pin
-                if amount > origin
+    def self.make_transfer(origin,recipient,pin,amount)
+       @account_list.each do |origin|
+           if origin[:account_number]== origin && origin[:pin] == pin
+               balance = origin[:balance]
+           end
+       end
+        @account_list.each do |recipient|
+        if recipient[:account_number] == recipient 
+                if amount > balance 
                     puts "Low balance "
                     exit
-                else origin > amount
-                    trans = list[:balance] += amount
-                    @deposit.push(amount)
+                else balance > amount
+                    trans = recipient[:balance] += amount
+                    origin[:transaction][:withdrawal].push(amount)
                     self.withdrawal(amount)
-                    puts"Transfer complete"
+                    puts"-----------------------------------"
+                    puts"  Transfer completed               ".blue
+                    puts"-----------------------------------"
                 end
             end
         end
@@ -228,13 +229,13 @@ def transfer( account_origin,account_dest,pin, amount)
                  if  !info.nil?
                      @account = BankAccount.new(info)
                      @account.save
-                     @@account_list.push(info)
+                     @account_list.push(info)
                         puts"-----------------------------------"
                         puts"\n"
                         puts"Account has been successfully created".yellow
                         puts"Your Account number is #{info[:account_number]}".blue
                         puts"your balance is #{info[:balance]}".red
-                        p @@account_list
+                        p @account_list
                         puts"\n"
                         puts"-----------------------------------"
                    
@@ -250,8 +251,8 @@ def transfer( account_origin,account_dest,pin, amount)
                     puts"----------------------------------------------------"
                     puts "What do you want to do today?".yellow
                     puts"----------------------------------------------------"
-                    puts"\n"
-                    puts"1)Deposit  2)Withdrawal 3)Transfer 4)Balance 5)Exit"
+                    puts"1)Deposit  2)Withdrawal 3)Transfer 4)Balance 5)Exit "
+                    puts"----------------------------------------------------"
                     puts"\n"
                     print"your choice :"
                     ans = gets.chomp.to_i
@@ -278,6 +279,17 @@ def transfer( account_origin,account_dest,pin, amount)
                         BankAccount.make_withdrawal(acct_num, pin, amount)
                         
                     when 3
+                        puts"-----------------------------------"
+                        puts"\n"
+                        puts "Please enter Your Account number:".blue
+                        origin = gets.chomp.to_i
+                        puts "Please enter the recipient Account Number:".blue
+                        recipient = gets.chomp.to_i
+                        puts"Please enter pin:".blue
+                        pin = gets.chomp.to_i
+                        puts "Transfer Amount :".blue
+                        amount =gets.chomp.to_i
+                        BankAccount.make_transfer(origin, recipient , pin, amount)
                         
                     when 4
                         puts"-----------------------------------"

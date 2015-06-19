@@ -1,16 +1,2 @@
----
-- :first_name: 'obed '
-  :last_name: lorisson
-  :address:
-    :street: '114-22 springfiedl blvd '
-    :city: 'cambria heighst '
-    :zip_code: 11411
-    :county: New York
-  :transaction:
-    :deposit:
-    - 5000
-    :withdrawal:
-    - 2000
-  :account_number: 1
-  :balance: 13000
-  :pin: 0
+--- 
+...
